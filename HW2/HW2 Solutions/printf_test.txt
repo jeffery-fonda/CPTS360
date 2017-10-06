@@ -1,0 +1,30 @@
+
+int main(int argc, char *argv[ ], char *env[ ])
+{
+	int i; //walking through env
+
+	my_printf("main(): argc=%d\n", argc); //prints out argc
+
+  for (i=0; i < argc; i++) //prints argv[]
+	{
+  	my_printf("argv[%d] = %s\n", i, argv[i]);
+	}
+
+  my_printf("Enter any key to continue");
+  getchar();
+
+  my_printf("--------- env strings -------------\n"); // Print env garbage
+  i = 0;
+
+  while(env[i]) // walks through the env stack
+  {
+    my_printf("env[%d] = %s\n", i, env[i]);
+    i++;
+  }
+
+  my_printf("---------- myprintf test cases ---------\n");
+  my_printf("print this garbage\n");
+	my_printf("test j=%d e=%x f=%c f=%s\n", 100, -100, 'a', "pass or fail");
+  my_printf("string=%s, e=%d  r=%u  y=%o  d=%x\n",
+            "testing string", -512, 2048, 200, 10);
+}
