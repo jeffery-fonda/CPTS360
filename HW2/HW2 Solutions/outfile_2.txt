@@ -1,0 +1,11 @@
+Device 	 Type 	 Head 	 Start Sector 	    Size 	 System
+
+Part0 	  7 	  1 	       18 	      702	 HPFS/NTFS
+Part1 	 83 	  0 	      720 	      720	 Linux
+Part2 	 82 	  0 	     1440 	      360	 Linux swap
+Part3 	  5 	  0 	     1800 	     1080	 Extended
+Part0 	 81 	  1 	     1818 	      342	 Minix >1.4b
+Part1 	  5 	  0 	     2160 	      360	 Extended
+Part0 	  6 	  1 	     2178 	      342	 FAT16
+Part1 	  5 	  0 	     2880 	      360	 Extended
+Part0 	 a5 	  1 	     2898 	      342	 FreeBSD
