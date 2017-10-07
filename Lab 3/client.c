@@ -1,4 +1,6 @@
+//**************************** ECHO CLIENT CODE **************************
 // The echo client client.c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,9 +14,8 @@
 struct hostent *hp;
 struct sockaddr_in  server_addr;
 
-int server_sock, r;
+int sock, r;
 int SERVER_IP, SERVER_PORT;
-
 
 // clinet initialization code
 
@@ -33,8 +34,8 @@ int client_init(char *argv[])
   SERVER_PORT = atoi(argv[2]);
 
   printf("2 : create a TCP socket\n");
-  server_sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (server_sock<0){
+  sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (sock<0){
      printf("socket call failed\n");
      exit(2);
   }
@@ -46,7 +47,7 @@ int client_init(char *argv[])
 
   // Connect to server
   printf("4 : connecting to server ....\n");
-  r = connect(server_sock,(struct sockaddr *)&server_addr, sizeof(server_addr));
+  r = connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
   if (r < 0){
      printf("connect failed\n");
      exit(1);
@@ -72,7 +73,7 @@ main(int argc, char *argv[ ])
   }
 
   client_init(argv);
-  // sock <---> server
+
   printf("********  processing loop  *********\n");
   while (1){
     printf("input a line : ");
@@ -84,11 +85,11 @@ main(int argc, char *argv[ ])
        exit(0);
 
     // Send ENTIRE line to server
-    n = write(server_sock, line, MAX);
+    n = write(sock, line, MAX);
     printf("client: wrote n=%d bytes; line=(%s)\n", n, line);
 
     // Read a line from sock and show it
-    n = read(server_sock, ans, MAX);
+    n = read(sock, ans, MAX);
     printf("client: read  n=%d bytes; echo=(%s)\n",n, ans);
   }
 }

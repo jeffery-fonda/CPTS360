@@ -12,9 +12,14 @@
 struct sockaddr_in  server_addr, client_addr, name_addr;
 struct hostent *hp;
 
-int  mysock, client_sock;              // socket descriptors
+int  sock, newsock;                  // socket descriptors
 int  serverPort;                     // server port number
 int  r, length, n;                   // help variables
+char num1[256];
+char num2[256];
+char summ[256];
+char *token;
+int numb1, numb2, sum;
 
 // Server initialization code:
 
@@ -34,8 +39,8 @@ int server_init(char *name)
 
    //  create a TCP socket by socket() syscall
    printf("2 : create a socket\n");
-   mysock = socket(AF_INET, SOCK_STREAM, 0);
-   if (mysock < 0){
+   sock = socket(AF_INET, SOCK_STREAM, 0);
+   if (sock < 0){
       printf("socket call failed\n");
       exit(2);
    }
@@ -48,7 +53,7 @@ int server_init(char *name)
 
    printf("4 : bind socket to host info\n");
    // bind syscall: bind the socket to server_addr info
-   r = bind(mysock,(struct sockaddr *)&server_addr, sizeof(server_addr));
+   r = bind(sock,(struct sockaddr *)&server_addr, sizeof(server_addr));
    if (r < 0){
        printf("bind failed\n");
        exit(3);
@@ -57,7 +62,7 @@ int server_init(char *name)
    printf("5 : find out Kernel assigned PORT# and show it\n");
    // find out socket port number (assigned by kernel)
    length = sizeof(name_addr);
-   r = getsockname(mysock, (struct sockaddr *)&name_addr, &length);
+   r = getsockname(sock, (struct sockaddr *)&name_addr, &length);
    if (r < 0){
       printf("get socketname error\n");
       exit(4);
@@ -69,7 +74,7 @@ int server_init(char *name)
 
    // listen at port with a max. queue of 5 (waiting clients)
    printf("5 : server is listening ....\n");
-   listen(mysock, 5);
+   listen(sock, 5);
    printf("===================== init done =======================\n");
 }
 
@@ -92,8 +97,8 @@ main(int argc, char *argv[])
 
      // Try to accept a client connection as descriptor newsock
      length = sizeof(client_addr);
-     client_sock = accept(mysock, (struct sockaddr *)&client_addr, &length);
-     if (client_sock < 0){
+     newsock = accept(sock, (struct sockaddr *)&client_addr, &length);
+     if (newsock < 0){
         printf("server: accept error\n");
         exit(1);
      }
@@ -103,25 +108,62 @@ main(int argc, char *argv[])
                                         ntohs(client_addr.sin_port));
      printf("-----------------------------------------------\n");
 
-     // Processing loop: newsock <----> client
+     // Processing loop
      while(1){
-       n = read(client_sock, line, MAX);
+       n = read(newsock, line, MAX);
        if (n==0){
            printf("server: client died, server loops\n");
-           close(client_sock);
+           close(newsock);
            break;
       }
 
-      // show the line string
+      //Use this to kill the server
+      if(!strcmp(line, "quit"))
+	     exit(1);
+
+      //Check if the first arg is a number
+      if (isdigit(line[0]))
+      {
+      // show the server line
+      printf("server: read  n=%d bytes; line=[%s]\n", n, line);
+
+      //Split to get the two numbers
+      token = strtok(line, " ");
+      strcpy(num1, token);
+      token = strtok(NULL, "\0");
+      strcpy(num2, token);
+
+      numb1 = atoi(num1);
+      numb2 = atoi(num2);
+      printf("num1 = %d\n", numb1);
+      printf("num2 = %d\n", numb2);
+
+      sum = numb1 + numb2;
+      printf("sum = %d\n", sum);
+      sprintf(summ, "%d", sum);
+
+
+      strcat(summ, " SUM");
+
+      // send the echo line to client
+      n = write(newsock, summ, MAX);
+
+      printf("server: wrote n=%d bytes; ECHO=[%s]\n", n, summ);
+      printf("server: ready for next request\n");
+      }
+      else
+      {
+      // show the server line
       printf("server: read  n=%d bytes; line=[%s]\n", n, line);
 
       strcat(line, " ECHO");
 
       // send the echo line to client
-      n = write(client_sock, line, MAX);
+      n = write(newsock, line, MAX);
 
       printf("server: wrote n=%d bytes; ECHO=[%s]\n", n, line);
       printf("server: ready for next request\n");
+      }
     }
  }
 }
