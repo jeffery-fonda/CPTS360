@@ -28,10 +28,8 @@ char* removeL(char *cmd);
 int lCmd(int argc, char *argv[]);
 char* getHomeDir(char *env[]);
 
-
 int ls_file(char *fname);
 int ls_dir(char *dname);
-
 
 char cwd[MAX]; //current working directory
 char hd[MAX]; //homedirectory
@@ -40,10 +38,8 @@ char res[MAX];
 char *t1 = "xwrxwrxwr-------";
 char *t2 = "----------------";
 
-
 int fd;
 int fp;
-
 
 int client_init(char *argv[])
 {
@@ -98,16 +94,17 @@ main(int argc, char *argv[] )
         char *cmd;
         char *myargv[32];
         char myargc;
-        //int o = 0;
 
-        if (argc < 3) {
+        if (argc < 3)
+        {
                 printf("Error, no arguments specified\n");
                 exit(1);
         }
 
         client_init(argv);
         printf("***************  processing loop  *************\n");
-        while (1) {
+        while (1)
+        {
                 int o = 0;
                 printf("\n");
                 printf("********************** menu *********************\n");
@@ -120,52 +117,50 @@ main(int argc, char *argv[] )
                 fgets(line, MAX, stdin); // get a line (end with \n) from stdin
                 myargc = 0;
                 line[strlen(line)-1] = 0; // kill \n at end
-                if (line[0]==0)      // exit if NULL line
+                if (line[0]==0) // exit if NULL line
+                {
                         exit(0);
+                }
                 strcpy(temp, line);
                 token = strtok(temp," ");
-                while(token != NULL) {
+                while(token != NULL)
+                {
                         myargc++;
                         myargv[o]=token;
                         token = strtok(NULL, " ");
                         o++;
                 }
-                //printf("Hi\n");
-                //printf("myargv0 :%s,myargv1: %s \n",myargv[0], myargv[1] );
                 cmd = myargv[0];
-                //printf("Hi\n");
+
                 if(strcmp(cmd, "quit") == 0)
                 {
                         exit(0);
                 }
-                if(!checkLocal(cmd) && checkValid(cmd)) {
+                if(!checkLocal(cmd) && checkValid(cmd))
+                {
                         n = write(sock, line, MAX);
-                        //printf("client: wrote n=%d bytes; line=(%s)\n", n, line);
                         m = read(sock, res, MAX);
                         if(strcmp(res, "1") == 0) //sucess
                         {
                                 printf("Server responsding...\n");
                                 response(cmd, myargc, myargv);
-
                         }
                         else if(strcmp(res, "0") == 0) //fail
                         {
                                 printf("No response from server.\n");
-
                         }
-
-                        //printf("Hi\n");
-
                 }
-                else if(checkLocal(cmd) && checkValid(removeL(cmd))) {
-                        //printf("Hi\n");
+                else if(checkLocal(cmd) && checkValid(removeL(cmd)))
+                {
                         cmd = removeL(cmd);
-                        printf("Local command :%s\n", cmd);
+                        printf("Local command:%s\n", cmd);
                         lCmd(myargc, myargv);
                 }
                 myargc = 0;
                 if (checkValid(cmd) ==0)
-                        printf("Bad command\n");
+                {
+                        printf("Invalid command.\n");
+                }
         }
 }
 
@@ -194,29 +189,35 @@ int checkValid (char* cmd)
         if(strcmp(cmd, "pwd") == 0)
         {
                 return 1;
-        } if(strcmp(cmd, "ls") == 0)
-        {
-                return 1;
-        } if(strcmp(cmd, "cd") == 0)
-        {
-                return 1;
-        } if(strcmp(cmd, "mkdir") == 0)
-        {
-                return 1;
-        } if(strcmp(cmd, "rmdir") == 0)
-        {
-                return 1;
-        } if(strcmp(cmd, "rm") == 0)
-        {
-                return 1;
-        } if(strcmp(cmd, "get") == 0)
-        {
-                return 1;
-        } if(strcmp(cmd, "put") == 0)
+        }
+        if(strcmp(cmd, "ls") == 0)
         {
                 return 1;
         }
-
+        if(strcmp(cmd, "cd") == 0)
+        {
+                return 1;
+        }
+        if(strcmp(cmd, "mkdir") == 0)
+        {
+                return 1;
+        }
+        if(strcmp(cmd, "rmdir") == 0)
+        {
+                return 1;
+        }
+        if(strcmp(cmd, "rm") == 0)
+        {
+                return 1;
+        }
+        if(strcmp(cmd, "get") == 0)
+        {
+                return 1;
+        }
+        if(strcmp(cmd, "put") == 0)
+        {
+                return 1;
+        }
         if(strcmp(cmd, "cat") == 0)
         {
                 return 1;
@@ -225,7 +226,6 @@ int checkValid (char* cmd)
         {
                 return 1;
         }
-
         return 0;
 }
 
@@ -245,13 +245,11 @@ char* removeL(char *cmd) //remove the first char (used to remove 'l')
                 noL[i - 1] = cmd[i];
                 noL[i++] = 0;
         }
-
         return noL;
 }
+
 int lCmd (int myargc, char* myargv[]) //command will not b null when called
 {
-
-        //function will only be called for local commands
         printf("Entering client command...\n\n");
         char *cmd = myargv[0];
         struct stat fstat, *sp;
@@ -264,7 +262,6 @@ int lCmd (int myargc, char* myargv[]) //command will not b null when called
 
         if(myargc > 1)
         {
-
                 op = myargv[1];
         }
 
@@ -276,7 +273,6 @@ int lCmd (int myargc, char* myargv[]) //command will not b null when called
         }
         if(strcmp(cmd, "ls") == 0)
         {
-                //printf("Hi\n");
                 printf("myargc = %d\n",myargc);
                 if((myargc > 1) && lstat(myargv[1], &fstat) < 0)
                 {
@@ -287,48 +283,41 @@ int lCmd (int myargc, char* myargv[]) //command will not b null when called
                 {
                         if(S_ISDIR(sp->st_mode))
                         {
-                                //printf("Hi\n");
                                 ls_dir(myargv[1]);
                                 return 0;
-                        }else{
-                                //printf("Hi\n");
+                        }
+                        else
+                        {
                                 ls_file(myargv[1]);
                                 return 0;
                         }
                 }
-
                 if(myargc == 1)
                 {
                         printf("ls current dir\n");
                         ls_dir("./");
                         return 0;
                 }
-
-                //printf("wtf happen with lls\n");
-                //need to ls all files
-
                 return 1;
         }
         if(strcmp(cmd, "cd") == 0)
         {
-                if(myargc>1) {
+                if(myargc>1)
+                {
                         getcwd(pwd, MAX);
                         strcat(pwd, "/");
                         strcat(pwd,op);
                         printf("myargv[1] = %s\n",myargv[1] );
                         printf("pwd = %s\n", pwd);
                         if(!(chdir(pwd) < 0))
+                        {
                                 printf("lcd OK\n");
+                        }
                 }
-                // if(!(chdir(pwd) < 0))//if argv available and chdir success
-                // {
-                //   printf("lcd OK\n");
-
-                // }
                 else if(myargc == 1)
                 {
                         printf("lcd to HOME dir\n");
-                        chdir("/home/fonda");
+                        chdir("/home/jfonda");
                         return 0;
                 }
                 else
@@ -341,7 +330,7 @@ int lCmd (int myargc, char* myargv[]) //command will not b null when called
         {
                 if(mkdir(op, 0777) < 0)
                 {
-                        printf("lmkdir FAIL -> errno=%d : %s\n", errno, strerror(errno));
+                        printf("lmkdir FAIL -> errno = %d : %s\n", errno, strerror(errno));
                 }else
                 {
                         printf("lmkdir %s OK\n", op);
@@ -388,12 +377,12 @@ int lCmd (int myargc, char* myargv[]) //command will not b null when called
                         printf("Nothing to be cat\n");
                         return 1;
                 }
-
                 if(lstat(myargv[1], &fstat) < 0)
                 {
                         printf("lstat %s\n failed", myargv[1]);
                         return 0;
-                }else
+                }
+                else
                 {
                         if(!S_ISREG(sp->st_mode))
                         {
@@ -401,7 +390,6 @@ int lCmd (int myargc, char* myargv[]) //command will not b null when called
                                 return 0;
                         }
                 }
-
                 fd = open(myargv[1], O_RDONLY);
 
                 if(fd < 0)
@@ -409,30 +397,28 @@ int lCmd (int myargc, char* myargv[]) //command will not b null when called
                         printf("cat failed\n");
                         return 1;
                 }
-
-                while(n = read(fd, buf, 1024)) {
+                while(n = read(fd, buf, 1024))
+                {
                         for(i = 0; i < n; i++)
                         {
                                 putchar(buf[i]);
                         }
                 }
-
                 close(fd);
         }
         if(strcmp(cmd, "quit") == 0)
         {
                 exit(1);
         }
-
         return 0;
 }
+
 char *getHomeDir(char *env[])
 {
         int i = 0;
         char line[MAX];
         char *hd = 0;
 
-        //assuming HOME path exists
         while(env[i])
         {
                 strcpy(line, env[i]);
@@ -440,13 +426,11 @@ char *getHomeDir(char *env[])
 
                 if(strcmp(hd, "HOME") == 0)
                 {
-                        //assuming HOME=something
                         hd = strtok(NULL, "=");
                         break;
                 }
                 i++;
         }
-
         return hd;
 }
 
@@ -456,27 +440,35 @@ int ls_file(char *fname)
         int r, i;
         char ftime[64];
 
-
         sp = &fstat;
-        //printf("name=%s\n", fname); getchar();
 
-        if ( (r = lstat(fname, &fstat)) < 0) {
+        if ( (r = lstat(fname, &fstat)) < 0)
+        {
                 printf("can't stat %s\n", fname);
                 exit(1);
         }
-
         if ((sp->st_mode & 0xF000) == 0x8000)
+        {
                 printf("%c",'-');
+        }
         if ((sp->st_mode & 0xF000) == 0x4000)
+        {
                 printf("%c",'d');
+        }
         if ((sp->st_mode & 0xF000) == 0xA000)
+        {
                 printf("%c",'l');
-
-        for (i=8; i >= 0; i--) {
+        }
+        for (i=8; i >= 0; i--)
+        {
                 if (sp->st_mode & (1 << i))
+                {
                         printf("%c", t1[i]);
+                }
                 else
+                {
                         printf("%c", t2[i]);
+                }
         }
 
         printf("%4d ",sp->st_nlink);
@@ -493,15 +485,16 @@ int ls_file(char *fname)
         printf("%s", basename(fname));
 
         // print -> linkname if it's a symbolic file
-        if ((sp->st_mode & 0xF000)== 0xA000) { // YOU FINISH THIS PART
+        if ((sp->st_mode & 0xF000)== 0xA000)
+        {
                 char *linkname;
                 const char *pathname;
                 pathname = dirname(linkname);
                 r = readlink(fname, linkname, sp->st_size+1);
-                if (r <0) {
+                if (r <0)
+                {
                         printf("readlink failed\n");
                 }
-                // use readlink() SYSCALL to read the linkname
                 printf(" -> %s", *linkname);
         }
         printf("\n");
@@ -512,17 +505,16 @@ int ls_dir(char *dname)
         DIR *dp;
         struct dirent *ep;
         dp = opendir(dname);
-        while ( ep=readdir(dp)) {
+        while ( ep=readdir(dp))
+        {
                 ls_file(ep->d_name);
-                //printf("%s \n", ep->d_name);
         }
-
 }
 
 int response(char* cmd, int myargc, char *myargv[])
 {
         int n = 0, i = 0;
-        int m= 0;
+        int m = 0;
         char buf[1024];
         char response[MAX];
         char sent[MAX];
@@ -534,11 +526,9 @@ int response(char* cmd, int myargc, char *myargv[])
         char ans[MAX];
         struct stat fstat, *sp;
         sp = &fstat;
-        //printf("Im in response@!!!!!\n");
-        if(myargc > 1 && strcmp(cmd, "get") == 0)
-        {
 
-                //printf("Im in get@!!!!!\n");
+        if (myargc > 1 && strcmp(cmd, "get") == 0)
+        {
                 fp = open(myargv[1], O_WRONLY | O_CREAT);
                 read(sock,res,MAX);
                 //printf("res = %s\n", res);
@@ -547,15 +537,12 @@ int response(char* cmd, int myargc, char *myargv[])
                 while( count < size)
                 {
                         n = read(sock,buf,MAX);
-
                         count += n;
-
                         write(fp, buf,n);
-
                 }
-                printf("done - server served you!\n");
+                printf("Finished - server has served you.\n");
                 close(fp);
-                printf("File closed\n");
+                printf("File closed.\n");
         }
         else if(strcmp(cmd, "put") == 0)
         {
@@ -571,25 +558,19 @@ int response(char* cmd, int myargc, char *myargv[])
                         {
                                 if((sp->st_mode & 0xF000) == 0x4000)
                                 {
-                                        printf("not going to give a dir\n");
+                                        printf("No directory given.\n");
                                         write(sock, "0", 2);
                                         return 0;
                                 }
                         }
-
                         fd = open(myargv[1], O_RDONLY);
-
 
                         if(fd < 0)
                         {
                                 printf("file open fail\n");
-                                //write(newsock, "0", 2);
                         }
 
-                        //write(sock, "1", MAX);
                         sprintf(ans,"%8d ",sp->st_size);
-                        //strcat(sent, ans);
-                        //printf("ans ===== %s\n\n\n\n\n\n", ans);
                         write(sock, ans, MAX);
                         printf("putting file:%s to client\n", myargv[1]);
                         while(m = read(fd, buf, MAX))
@@ -602,7 +583,6 @@ int response(char* cmd, int myargc, char *myargv[])
                 {
                         write(sock, "0", 2);
                 }
-                //return 2;//need to write more to server
         }
         else if(strcmp(cmd, "pwd") == 0)
         {
@@ -644,7 +624,6 @@ int response(char* cmd, int myargc, char *myargv[])
                         {
                                 bzero(response,MAX);
                                 read(sock, response,MAX);
-
                                 printf("%s\n",response);
                         }
                 }
@@ -656,6 +635,4 @@ int response(char* cmd, int myargc, char *myargv[])
                         return 2;
                 }
         }
-        //break;
 }
-//break;

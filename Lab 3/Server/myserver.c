@@ -37,13 +37,6 @@ char *getHomeDir(char *env[]);
 int ls_dir(char *dname);
 int ls_file(char *fname);
 
-// enum state_name{
-//   CLIENT_CONECT,
-//   CLIENT_LOGIN,
-//   CLIENT_PASSWORD
-// }server_state;
-// Server initialization code:
-
 int server_init(char *name, int number)
 {
         printf("==================== server init ======================\n\n");
@@ -102,52 +95,50 @@ int server_init(char *name, int number)
 
 main(int argc, char *argv[])
 {
-        //strcat(sucess, "Sucess");
-        //strcat(failed, "Failed");
         char *hostname;
         char line[MAX];
         char temp[MAX];
         char *token;
         char* cmd;
-        //char *myargv[32];
         int myargc;
         int i;
         bzero(cwd, MAX);
         hp = getenv("HOME");
-        //strcpy(hd,getHomeDir(env));
-        //uint16_t network_bytes_order_r, network_bytes_order_s;
         if (argc < 2)
+        {
                 hostname = "localhost";
+        }
         else
+        {
                 hostname = argv[1];
+        }
         if (argc < 3)
+        {
                 cusPort = 4000;
+        }
         else
+        {
                 cusPort = atoi(argv[2]);
-
-        //cusPort = argv[2];
+        }
         server_init(hostname, cusPort);
-        //send(newsock, Welcom,MAX,MAX);
-        // Try to accept a client request
         while(1)
         {
-                //int myargc = 0 ;
                 char *myargv[32];
                 int o = 0;
-                printf("server: accepting new connection ....\n");
+                printf("Server Message: accepting new connection ....\n");
 
                 // Try to accept a client connection as descriptor newsock
                 length = sizeof(client_addr);
                 newsock = accept(sock, (struct sockaddr *)&client_addr, &length);
                 if (newsock < 0) {
-                        printf("server: accept error\n");
+                        printf("Server Message: accept error\n");
                         exit(1);
                 }
-                printf("server: accepted a client connection from\n");
+                printf("Server Message: accepted a client connection from\n");
                 printf("-----------------------------------------------\n");
                 printf("        IP = %s  port = %d\n", inet_ntoa(client_addr.sin_addr.s_addr),
                        ntohs(client_addr.sin_port));
-                printf("-----------------------------------------------\n");
+                printf("-----------------------------------------------\n\n");
 
                 // Processing loop
                 while(1)
@@ -155,16 +146,16 @@ main(int argc, char *argv[])
                         myargc = 0;
                         n = read(newsock, line, MAX);
                         if (n==0) {
-                                printf("server: client died, server loops\n");
+                                printf("Server Message: client died, server will loop\n");
                                 close(newsock);
                                 break;
                         }
-
                         // show the line string
-                        printf("server: read  n=%d bytes; line=[%s]\n", n, line);
+                        printf("Server Message: read n = %d bytes; line = [%s]\n", n, line);
                         printf("Command received from client: %s\n\n",line );
                         strcpy(temp, line);
                         token = strtok(temp," ");
+
                         while(token != NULL)
                         {
                                 myargc++;
@@ -205,6 +196,7 @@ char *getHomeDir(char *env[])
 
         return hd;
 }
+
 int ls_file(char *fname)
 {
         struct stat fstat, *sp;
@@ -216,59 +208,48 @@ int ls_file(char *fname)
         sp = &fstat;
         //printf("name=%s\n", fname); getchar();
 
-        if ( (r = lstat(fname, &fstat)) < 0) {
+        if ( (r = lstat(fname, &fstat)) < 0)
+        {
                 printf("can't stat %s\n", fname);
                 //exit(1);
         }
-
-        if ((sp->st_mode & 0xF000) == 0x8000) {
-                //printf("%c",'-');
-                //strcat(ans,"-");
+        if ((sp->st_mode & 0xF000) == 0x8000)
+        {
                 sprintf(ans, "%c", '-');
                 strcpy(sent, ans);
-                //write(newsock,ans,MAX);
         }
-        if ((sp->st_mode & 0xF000) == 0x4000) {
-                //printf("%c",'d');
-                //strcat(ans,"d");
+        if ((sp->st_mode & 0xF000) == 0x4000)
+        {
                 sprintf(ans, "%c", 'd');
                 strcpy(sent, ans);
-                //write(newsock,ans,MAX);
         }
-        if ((sp->st_mode & 0xF000) == 0xA000) {
-                // printf("%c",'l');
-                //strcat(ans,"l");
+        if ((sp->st_mode & 0xF000) == 0xA000)
+        {
                 sprintf(ans, "%c", 'l');
                 strcpy(sent, ans);
-                //write(newsock,ans,MAX);
         }
 
-        for (i=8; i >= 0; i--) {
-                if (sp->st_mode & (1 << i)) {
-
+        for (i=8; i >= 0; i--)
+        {
+                if (sp->st_mode & (1 << i))
+                {
                         sprintf(ans,"%c",t1[i]);
                         strcat(sent, ans);
                 }
-                else{
-
+                else
+                {
                         sprintf(ans,"%c",t2[i]);
                         strcat(sent, ans);
                 }
         }
-
-        // printf("%4d ",sp->st_nlink);
-
         sprintf(ans,"%4d ",sp->st_nlink);
         strcat(sent, ans);
-        // printf("%4d ",sp->st_gid);
 
         sprintf(ans,"%4d ",sp->st_gid);
         strcat(sent, ans);
-        // printf("%4d ",sp->st_uid);
 
         sprintf(ans,"%4d ",sp->st_uid);
         strcat(sent, ans);
-        //printf("%8d \n",sp->st_size);
 
         sprintf(ans,"%8d ",sp->st_size);
         strcat(sent, ans);
@@ -279,8 +260,6 @@ int ls_file(char *fname)
         ftime[strlen(ftime)-1] = 0;
         sprintf(ans,"%s  ",ftime);
         strcat(sent, ans);
-        //strcpy(ans, ftime)
-        //write(newsock,ans,MAX);
 
         // print name
         printf("is_file: %s\n", basename(fname));
@@ -288,35 +267,18 @@ int ls_file(char *fname)
         sprintf(ans,"%s",basename(fname));
         strcat(sent, ans);
         write(newsock,sent,MAX);
-        //printf("sent = :%s\n",sent );
-
-        // print -> linkname if it's a symbolic file
-        // if ((sp->st_mode & 0xF000)== 0xA000){ // YOU FINISH THIS PART
-        //   char *linkname;
-        //   const char *pathname;
-        //   pathname = dirname(linkname);
-        //   r = readlink(fname, linkname, sp->st_size+1);
-        //   if (r <0){
-        //     printf("readlink failed\n");
-        //   }
-        //    // use readlink() SYSCALL to read the linkname
-        //   printf(" -> %s", *linkname);
-        // }
-        //printf("\n");
-        //write(newsock, "new",MAX);
 }
+
 int ls_dir(char *dname)
 {
         DIR *dp;
         struct dirent *ep;
         dp = opendir(dname);
-        while ( ep=readdir(dp)) {
+        while ( ep=readdir(dp))
+        {
                 ls_file(ep->d_name);
-
-                //printf("%s \n", ep->d_name);
         }
         write(newsock,"ls complete",MAX);
-
 }
 
 int getCmd(int myargc, char* myargv[])
@@ -326,50 +288,40 @@ int getCmd(int myargc, char* myargv[])
         char buf[1024];
         struct stat fstat, *sp;
         char ans[MAX];
-        //char sent[MAX]
         bzero(buf, 1024);
         bzero(ans,MAX);
 
         sp = &fstat;
-
-
 
         if(myargc > 1)
         {
                 if(lstat(myargv[1], &fstat) < 0)
                 {
                         write(newsock, "0", 2);
-                        printf("can't lstat file\n");
+                        printf("Can't lstat file.\n");
                         return 1;
                 }
                 else
                 {
                         if((sp->st_mode & 0xF000) == 0x4000)
                         {
-                                printf("not going to give a dir\n");
+                                printf("No directory given.\n");
                                 write(newsock, "0", 2);
                                 return 0;
                         }
                 }
-                // sprintf(ans,"%8d ",sp->st_size);
-                // //strcat(sent, ans);
-                // printf("ans ===== %s\n\n\n\n\n\n", ans);
-                // write(newsock, ans, MAX);
                 fd = open(myargv[1], O_RDONLY);
-
 
                 if(fd < 0)
                 {
-                        printf("file open fail\n");
-                        //write(newsock, "0", 2);
+                        printf("Error opening file.\n");
                 }
 
                 write(newsock, "1", MAX);
                 sprintf(ans,"%8d ",sp->st_size);
-                //strcat(sent, ans);
-                //printf("ans ===== %s\n\n\n\n\n\n", ans);
                 write(newsock, ans, MAX);
-                printf("putting file: %s to client\n", myargv[1]);
+                printf("Sending file %s to client...\n", myargv[1]);
+
                 while(m = read(fd, buf, MAX))
                 {
                         write(newsock, buf, m);
@@ -393,33 +345,24 @@ int putCmd(int myargc, char *myargv[])
         char ans[MAX];
         int count = 0;
         int n = 0;
-        //printf("Hi\n");
-        //tell client to goahead and start putting out
+
         write(newsock, "1", MAX);
-
-        //m = read(newsock, good, 2);
-        //m = read(newsock, good, MAX);
-
-        //if(strcmp(good, "0") == 0){return 0;}
         fp = open(myargv[1], O_WRONLY | O_CREAT); //open file
         read(newsock,res,MAX);
-        //printf("res = %s\n", res);
         size = atoi(res);
-        printf("size = %d\n", size);
+        printf("Size = %d\n", size);
+
         while( count < size )
         {
                 n = read(newsock,buf,MAX);
-
                 count += n;
-
                 write(fp, buf,n);
-
         }
-        printf("Success\n");
+        printf("Success!\n");
         close(fp);
-        printf("File closed\n");
-
+        printf("File closed.\n");
 }
+
 int excute (int myargc, char* myargv[]) //command will not b null when called
 {
         char answer[MAX];
@@ -430,7 +373,7 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
         bzero(answer, MAX);
         cmd  = myargv[0];
         char pwd[MAX];
-        //printf("Hi\n");
+
         if(myargc > 1)
         {
                 op = myargv[1];
@@ -446,10 +389,6 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
         }
         if(strcmp(cmd, "ls") == 0)
         {
-                //printf("Hi\n")  ;
-                //printf("myargc = %d\n",myargc );
-                //printf("myargv[0] = %s\n", myargv[0]);
-                //printf("myargv[1] = %s\n", myargv[1]);
                 write(newsock, "1", MAX);
                 if((myargc > 1) && lstat(myargv[1], &fstat) < 0)
                 {
@@ -462,66 +401,53 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
                 {
                         if(S_ISDIR(sp->st_mode))
                         {
-                                //ls_dir(myargv[1]);
                                 strcat(answer, "dir");
                                 write(newsock, answer, MAX);
                                 ls_dir(myargv[1]);
                                 return 0;
-                        }else{
-
+                        }
+                        else
+                        {
                                 strcat(answer, "file");
                                 write(newsock, answer, MAX);
                                 ls_file(myargv[1]);
-                                //write(newsock,"done",MAX);
                                 return 0;
                         }
                 }
-
                 if(myargc == 1)
                 {
                         strcat(answer, "dir");
                         write(newsock, answer, MAX);
                         ls_dir("./");
-                        printf("ls current directory OK");
+                        printf("ls of the current directory OK.");
                         return 0;
                 }
-
                 return 1;
         }
         if(strcmp(cmd, "cd") == 0)
         {
-                printf("myargc =%d\n",myargc );
+                printf("myargc = %d\n", myargc);
                 printf("op = %s\n",op );
                 write(newsock, "1", MAX); //start message
-                if(myargc>1) {
+                if(myargc>1)
+                {
                         getcwd(pwd, MAX);
                         strcat(pwd, "/");
                         strcat(pwd,op);
                         printf("myargv[1] = %s\n",myargv[1] );
                         printf("pwd = %s\n", pwd);
-                        if(!(chdir(pwd) < 0)) {
-                                printf("client request: cd OK\n");
+                        if(!(chdir(pwd) < 0))
+                        {
+                                printf("Client request: cd OK\n");
                                 strcat(answer, "cd OK");
                                 write(newsock, answer, MAX);
                                 printf("cd OK\n");
                         }
                 }
-                // printf("myargc =%d\n",myargc );
-                // printf("op = %s\n",op );
-                // write(newsock, "1", MAX);//start message
-                // if(!(chdir(pwd) < 0))//cd sucessed
-                // {
-
-                //   printf("client request: cd OK\n");
-                //   strcat(answer, "cd OK");
-                //   write(newsock, answer, MAX);
-                //   printf("cd OK\n");
-                // }
                 if(myargc == 1)
                 {
-
                         printf("cd to HOME dir\n");
-                        chdir("/home/haoran");
+                        chdir("/home/jfonda");
                         strcat(answer, "cd to HOME dir");
                         write(newsock, answer, MAX);
                         printf("cd to HOME dir\n");
@@ -529,7 +455,7 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
                 }
                 else
                 {
-                        printf("client request: cd FAILED\n");
+                        printf("Client request: cd FAILED\n");
                         strcat(answer, "cd FAILED");
                         write(newsock, answer, MAX);
                         printf("cd FAILED\n");
@@ -545,9 +471,8 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
                         printf("mkdir FAIL \n");
                         strcat(answer, "mkdir FAIL");
                         write(newsock, answer, MAX);
-
-
-                }else
+                }
+                else
                 {
                         printf("mkdir %s OK\n", op);
                         strcat(answer, "mkdir OK");
@@ -561,20 +486,16 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
                 write(newsock, "1", MAX);
                 if(rmdir(op) < 0)
                 {
-
                         printf("rmdir FAIL \n");
                         strcat(answer, "rmdir FAIL ");
                         write(newsock, answer, MAX);
-
-
-                }else
+                }
+                else
                 {
                         printf("rmdir %s OK\n", op);
                         strcat(answer, "rmdir OK");
                         write(newsock, answer, MAX);
                         printf("rmdir OK\n");
-
-                        //
                 }
                 return 1;
         }
@@ -586,7 +507,6 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
                         printf("rm FAIL");
                         strcat(answer, "rm FAIL");
                         write(newsock, answer, MAX);
-
                 }
                 else
                 {
@@ -618,6 +538,5 @@ int excute (int myargc, char* myargv[]) //command will not b null when called
         {
                 exit(1);
         }
-
         return 0;
 }
