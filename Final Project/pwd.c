@@ -6,7 +6,7 @@ int my_pwd()
         char temp[128] = "";
         char name[64] = "";
         int ino, parent_ino;
-        MINODE *mip = running->cwd;
+        MINODE *mip = running->cwd; //set it to the current working directory
 
         //check if at root
         if(mip == root)

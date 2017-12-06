@@ -20,6 +20,7 @@ void my_stat(char *path)
 
 								ip = &mip->INODE;
 
+								//all of these are found under the inode block pointer (B5)
 								printf("  File: %s\n", name);
 								printf("  Size: %d\tBlocks: %12d ", ip->i_size, ip->i_blocks);
 								if(S_ISDIR(ip->i_mode))

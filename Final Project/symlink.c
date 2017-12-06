@@ -1,5 +1,5 @@
 //symlink links by name
-//could potentially link to places that dont exist
+//could potentially link to places that don't exist
 void my_symlink(char *path)
 {
 								int ino, i;
@@ -47,7 +47,7 @@ void my_symlink(char *path)
 
 								if(!parent_mip) //make sure we can read the parents mip
 								{
-																printf("ERROR: Cannot get parent mip!\n");
+																printf("ERROR: Cannot get parent MIP!\n");
 																return;
 								}
 

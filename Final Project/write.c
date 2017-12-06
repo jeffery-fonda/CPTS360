@@ -24,15 +24,15 @@ int my_write(int fd, char buf[], int nbytes)
 								//goes through the OpenFileTable to find the fd
 								for(i = 0; i < NOFT; i++)
 								{
-																if(OpenFileTable[i].inodeptr == running->fd[fd]->inodeptr)
+																if(OpenFileTable[i].inodeptr == running->fd[fd]->inodeptr) //if the file ptr matches the running processes file ptr
 																{
-																								oftp = running->fd[fd];
+																								oftp = running->fd[fd]; //it has been found, add to open file table
 																								break;
 																}
 								}
 
 								//ensures the fd is open for write
-								if(!oftp || (oftp->mode != 1 && oftp->mode != 2 && oftp->mode != 3))
+								if(!oftp || (oftp->mode != 1 && oftp->mode != 2 && oftp->mode != 3)) //checking for write only caused issues
 								{
 																printf("ERROR: Wrong file mode for write!\n");
 																return;
@@ -46,16 +46,17 @@ int my_write(int fd, char buf[], int nbytes)
 								//writes while there are more bytes to be written
 								while(nbytes > 0)
 								{
-																lbk = oftp->offset / BLKSIZE;
+																//mailmans
+																lbk = oftp->offset / BLKSIZE; //last block
 																startByte = oftp->offset % BLKSIZE;
 
-																if(lbk < 12)
+																if(lbk < 12) //should be less than 12 as first 10 are reserved
 																{
-																								if(mip->INODE.i_block[lbk] == 0)
+																								if(mip->INODE.i_block[lbk] == 0) //make sure the block is available
 																								{
-																																mip->INODE.i_block[lbk] = balloc(mip->dev);
+																																mip->INODE.i_block[lbk] = balloc(mip->dev); //if it is available, allocate
 																								}
-																								blk = mip->INODE.i_block[lbk];
+																								blk = mip->INODE.i_block[lbk]; //set block to newly allocated block
 																}
 																else if(lbk >= 12 && lbk < 256 + 12)
 																{
@@ -63,7 +64,7 @@ int my_write(int fd, char buf[], int nbytes)
 																								//check if indirect block, else we need to allocate it
 																								if(!mip->INODE.i_block[12])
 																								{
-																																mip->INODE.i_block[12] = balloc(mip->dev);
+																																mip->INODE.i_block[12] = balloc(mip->dev); //allocate block space
 
 																																//fill the new block with 0's
 																																get_block(mip->dev, mip->INODE.i_block[12], write_buf);
@@ -90,7 +91,7 @@ int my_write(int fd, char buf[], int nbytes)
 																								if(mip->INODE.i_block[13] == 0)
 																								{
 																																mip->INODE.i_block[13] = balloc(mip->dev);
-																																//fill it with 0's!
+																																//fill it with 0's
 																																get_block(mip->dev, mip->INODE.i_block[13], write_buf);
 																																for(i = 0; i < BLKSIZE; i++)
 																																								write_buf[i] = 0;
@@ -99,6 +100,7 @@ int my_write(int fd, char buf[], int nbytes)
 
 																								get_block(mip->dev, mip->INODE.i_block[13], write_buf);
 
+																								//mailmans
 																								indirect_blk = (lbk - 256 - 12) / 256;
 																								indirect_off = (lbk - 256 - 12) % 256;
 
@@ -108,23 +110,24 @@ int my_write(int fd, char buf[], int nbytes)
 																								//if no block yet, have to allocate it
 																								if(!blk)
 																								{
-																																ip = balloc(mip->dev);
+																																ip = balloc(mip->dev); //allocate block
 																																blk = *ip;
 
+																																//fill with 0's
 																																get_block(mip->dev, blk, write_buf);
 																																for(i = 0; i < BLKSIZE; i++)
 																																								write_buf[i] = 0;
 																																put_block(mip->dev, blk, write_buf);
 																								}
 
-																								get_block(mip->dev, blk, write_buf);
+																								get_block(mip->dev, blk, write_buf); //get the block from device
 
 																								ip = (int*)write_buf + indirect_off;
 																								blk = *ip;
 
 																								if(!blk)
 																								{
-																																*ip = balloc(mip->dev);
+																																*ip = balloc(mip->dev); //more allocation
 																																blk = *ip;
 																																put_block(mip->dev, blk, write_buf);
 																								}
@@ -134,7 +137,7 @@ int my_write(int fd, char buf[], int nbytes)
 																cp = write_buf + startByte;
 																remain = BLKSIZE - startByte;
 
-																//Writes byte by byte
+																//writes byte by byte
 																while(remain > 0)
 																{
 																								*cp++ = *cq++;
@@ -152,7 +155,7 @@ int my_write(int fd, char buf[], int nbytes)
 								}
 
 								mip->dirty = 1;
-								printf("Wrote %d char into file descripter fd =%d\n", counter, fd);
+								printf("Wrote %d char into file descripter fd = %d\n", counter, fd);
 								return nbytes;
 }
 
@@ -164,10 +167,10 @@ void do_write(char *path)
 								//open file table
 								OFT *ofp;
 
-								//Checks
+								//checks
 								if(!path)
 								{
-																printf("ERROR: No file name!!\n");
+																printf("ERROR: No file name given!\n");
 																return;
 								}
 
@@ -179,7 +182,7 @@ void do_write(char *path)
 
 								//after making sure there's the right number of inputs,
 								//take in the fd
-								fd = atoi(path);
+								fd = atoi(path); //path is just file name
 
 								for(i = 0; i < NOFT; i++)
 								{

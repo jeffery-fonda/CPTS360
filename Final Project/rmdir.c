@@ -1,15 +1,15 @@
 //checks the minode to ensure the dir is empty
-//if the dir isnt empty we cannot delete the dir
+//if the dir isn't empty we cannot delete the dir
 int isEmptyDir(MINODE *mip)
 {
 								char buf[1024];
-								INODE *ip = &mip->INODE;
+								INODE *ip = &mip->INODE; //make it an INODE pointer so we can use the inode pointer members
 								char *cp;
 								char name[64];
 								DIR *dp; //dir pointer
 
-								//link count greater than 2 has files
-								if(ip->i_links_count > 2)
+								//link count greater than 2, it has files
+								if(ip->i_links_count > 2) //found in inode block
 								{
 																printf("Dir has files!\n");
 																return 1;
@@ -27,8 +27,8 @@ int isEmptyDir(MINODE *mip)
 
 																								while(cp < buf + 1024)
 																								{
-																																strncpy(name, dp->name, dp->name_len);
-																																name[dp->name_len] = 0;
+																																strncpy(name, dp->name, dp->name_len); //copy names
+																																name[dp->name_len] = 0; //set names to 0
 
 																																if(strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
 																																{
@@ -161,7 +161,7 @@ void remove_dir(char *path)
 								INODE *p_ip;
 								char temp[64], child[64];
 
-								//Checks
+								//checks
 								if(!path)
 								{
 																printf("ERROR: No directory name given!\n");
