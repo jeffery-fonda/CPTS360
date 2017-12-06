@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
                         ls(path,p0);
                         break;
                 case 4:
-                        printf("Available commands: menu, cd, ls, pwd, quit\n");
+                        printf("Available commands: menu, cd, ls, pwd, mkdir, quit\n");
                         break;
                 case 99:
                         exit(0);
