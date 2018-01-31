@@ -40,41 +40,41 @@
    mount, unmount
    File permission checking
 
-	 Simple EXT2 File System:
-	 |	 0		  1		   2		 3		  4	 | 5................49 |	50...............|
-	 | Boot | Super | GD | BMAP | IMAP | Inodes Blocks...... | data blocks...... |
+   Simple EXT2 File System:
+ |	 0		  1		   2		 3		  4	 | 5................49 |	50...............|
+ | Boot | Super | GD | BMAP | IMAP | Inodes Blocks...... | data blocks...... |
 
-	 Each block group contains the following blocks:
-	 		Boot (B0): is the boot block, which is not used by the file system.
-	 		Superblock (B1): contains information about the entire file system.
-	 						s_indoes_count - total number of indodes
-							s_blocks_count - total number of blocks
-							s_r_blocks_count
-							s_free_blocks_count - current number of free blocks
-							s_free_inodes_count - current number of free inodes
-							s-magic - for checking file system, should be 0xEF53 for EXT2
-	 		Group Descriptor (B2): EXT2 divides disk blocks into groups, each group contains 8192 blocks.
-	 						bg_block_bitmap - Bmap block number
-							bg_inode_bitmap - Imap block number
-							bg_inode_table - inodes begin block number
-							bg_free_blocks_count
-							bg_free_inodes_count
-							bg_used_dirs_count
-	 		Bmap (B3): bitmap is a sequence of bits used to represent some kind of items e.g. disk blocks or Inodes
-	 						0 means the bit is free
-							1 means the bit is in use
-	 		Inode Bmap (B4): data structure used to represent a file
-	 		Inodes (B5): every file is represented by a unique inode structure of 128 bytes
-	 						i_mode - 16 bits = |tttt|ugs|rwx|rwx|rwx|
-							i_uid - owner user id
-							i_size - file size in bytes
-							i_atime - time fields in seconds
-							i_ctime
-							i_mtime
-							i_dtime
-							i_gid - group id
-							i_links_count - hard link counts
-							i_blocks - number of 512 byte sectors
+   Each block group contains the following blocks:
+    Boot (B0): is the boot block, which is not used by the file system.
+    Superblock (B1): contains information about the entire file system.
+        s_indoes_count - total number of indodes
+       s_blocks_count - total number of blocks
+       s_r_blocks_count
+       s_free_blocks_count - current number of free blocks
+       s_free_inodes_count - current number of free inodes
+       s-magic - for checking file system, should be 0xEF53 for EXT2
+    Group Descriptor (B2): EXT2 divides disk blocks into groups, each group contains 8192 blocks.
+        bg_block_bitmap - Bmap block number
+       bg_inode_bitmap - Imap block number
+       bg_inode_table - inodes begin block number
+       bg_free_blocks_count
+       bg_free_inodes_count
+       bg_used_dirs_count
+    Bmap (B3): bitmap is a sequence of bits used to represent some kind of items e.g. disk blocks or Inodes
+        0 means the bit is free
+       1 means the bit is in use
+    Inode Bmap (B4): data structure used to represent a file
+    Inodes (B5): every file is represented by a unique inode structure of 128 bytes
+        i_mode - 16 bits = |tttt|ugs|rwx|rwx|rwx|
+       i_uid - owner user id
+       i_size - file size in bytes
+       i_atime - time fields in seconds
+       i_ctime
+       i_mtime
+       i_dtime
+       i_gid - group id
+       i_links_count - hard link counts
+       i_blocks - number of 512 byte sectors
  */
 
 void menu() //displays the available commands

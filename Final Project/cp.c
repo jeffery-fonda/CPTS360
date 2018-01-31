@@ -13,8 +13,8 @@ void cp_file(char *path)
 
 								printf("Copying file!\n");
 
-								//Check to make sure there is a sorce and dest defined
-								//Strcpy to src and dest so we dont lose them
+								//check to make sure there is a sorce and dest defined
+								//strcpy to src and dest so we dont lose them
 								if (!strcmp(path, ""))
 								{
 																printf("No source specified!\n");
